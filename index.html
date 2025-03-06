@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Meu Amor 💖</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .mensagem {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 2em;
+            text-shadow: 2px 2px 10px pink;
+        }
+
+        p {
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+
+        img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 3px solid white;
+            margin-top: 15px;
+        }
+
+        /* Botão de Play */
+        .play-music {
+            background: pink;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            margin-top: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mensagem">
+        <h1>Feliz 1 ano e 10 meses, meu amor! 🎉</h1>
+        <p>Quero que saiba que eu fui o homem mais feliz ao seu lado, e juro pelo meu coração que vou te dar uma vida feliz, para que possamos viver juntos em paz... eu te amo❤️</p>
+        <img src="eu.jpg" alt="Nossa Foto">
+        <br>
+        <button class="play-music">🎶 Tocar Música</button>
+    </div>
+
+    <canvas id="fireworks"></canvas>
+
+    <audio id="music" loop>
+        <source src="pretty.mp3" type="audio/mp3">
+        Seu navegador não suporta áudio.
+    </audio>
+
+    <script>
+        // Música com botão de play (para celular)
+        document.querySelector(".play-music").addEventListener("click", function() {
+            const music = document.getElementById("music");
+            music.play();
+            this.style.display = "none"; // Esconde o botão após tocar
+        });
+
+        // Configuração do canvas
+        const canvas = document.getElementById("fireworks");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        class Firework {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.particles = [];
+                for (let i = 0; i < 30; i++) {
+                    this.particles.push({
+                        x: this.x,
+                        y: this.y,
+                        speed: Math.random() * 3 + 1,
+                        angle: Math.random() * Math.PI * 2,
+                        alpha: 1
+                    });
+                }
+            }
+
+            update() {
+                this.particles.forEach(p => {
+                    p.x += Math.cos(p.angle) * p.speed;
+                    p.y += Math.sin(p.angle) * p.speed;
+                    p.alpha -= 0.03;
+                });
+
+                this.particles = this.particles.filter(p => p.alpha > 0);
+            }
+
+            draw() {
+                this.particles.forEach(p => {
+                    ctx.fillStyle = this.color;
+                    ctx.globalAlpha = p.alpha;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        let fireworks = [];
+        function animate() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            fireworks.forEach(f => f.update());
+            fireworks.forEach(f => f.draw());
+            fireworks = fireworks.filter(f => f.particles.length > 0);
+            requestAnimationFrame(animate);
+        }
+
+        function launchFirework() {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height / 2;
+            const colors = ["red", "yellow", "blue", "green", "purple", "orange", "pink"];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            fireworks.push(new Firework(x, y, color));
+        }
+
+        setInterval(launchFirework, 800); // Intervalo maior para melhor desempenho no celular
+        animate();
+
+        window.addEventListener("resize", () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+
+</body>
+</html>
